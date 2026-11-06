@@ -57,6 +57,14 @@ void main() {
       await tester.pumpWidget(const SizedBox());
       expect(calls, hasLength(3), reason: 'restores on dispose');
     });
+    testWidgets('locks to custom compact orientations', (tester) async {
+      const landscape = [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight];
+      await tester.pumpWidget(_sized(
+        const Size(390, 844),
+        const CompactPortraitLock(compactOrientations: landscape, child: SizedBox()),
+      ));
+      expect(calls.single.arguments, ['DeviceOrientation.landscapeLeft', 'DeviceOrientation.landscapeRight']);
+    });
   });
 
   group('FoldInfo / AppFoldScope', () {

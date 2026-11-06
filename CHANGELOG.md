@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0 — 2026-11-06
+
+- **Breaking:** step 6 is now `lifecycle-media` (was `lifecycle-camera`). It covers every feature that reacts to the life cycle or locks the orientation, not just the camera:
+  - A shared core: conditional orientation locks, an audit of every `AppLifecycleState` consumer with an explicit Split View policy, and media sizing on the inner display.
+  - One reference per feature, loaded only when the app uses it: `camera.md`, `video.md`, `maps.md`, `audio.md` and `other.md` (AR, games, WebView, sensors).
+  - `adopt` skips the step only when the app has no orientation lock, no media feature and no life cycle consumer that stops something.
+- `discovery` detects video, maps and audio packages, life cycle consumers and `UIBackgroundModes`, and asks one Split View question per detected feature. The profile's `camera:` section becomes `media:` with a `features` list; existing profiles with `camera:` are still read.
+- `CompactPortraitLock` takes `compactOrientations`, so the same template covers landscape locks such as fullscreen video.
+
 ## 0.2.0 — 2026-11-06
 
 - New `stacked` git strategy, now the recommended default. Each step's branch is created from the previous step's branch, and its pull request targets that branch, so every PR shows only its own step. The `adopt` skill documents how to open the stack, rebase it after review changes, and retarget PRs as lower ones merge. `branch-per-step` still creates every branch from the base branch.

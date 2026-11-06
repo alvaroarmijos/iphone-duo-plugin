@@ -1,5 +1,5 @@
-// Template for iPhone Duo step 6. Place next to the camera feature
-// (it only serves screens that lock to portrait).
+// Template for iPhone Duo step 6. Place next to the feature that locks its
+// orientation (camera, fullscreen video, scanner...).
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -7,17 +7,22 @@ import 'package:flutter/widgets.dart';
 /// the iPhone Duo outer display.
 const double compactShortestSide = 600;
 
-/// Locks [child] to portrait only on compact screens, re-evaluates when the
-/// app moves between displays (fold/unfold, Split View), and restores
-/// [restoreOrientations] when disposed.
+/// Locks [child] to [compactOrientations] (portrait by default) only on
+/// compact screens, re-evaluates when the app moves between displays
+/// (fold/unfold, Split View), and restores [restoreOrientations] when
+/// disposed. For fullscreen video pass the landscape orientations.
 class CompactPortraitLock extends StatefulWidget {
   const CompactPortraitLock({
     required this.child,
+    this.compactOrientations = const [DeviceOrientation.portraitUp],
     this.restoreOrientations = DeviceOrientation.values,
     super.key,
   });
 
   final Widget child;
+
+  /// Orientations to lock to on compact screens.
+  final List<DeviceOrientation> compactOrientations;
 
   /// Orientations to restore on exit. Use the app's global setting.
   final List<DeviceOrientation> restoreOrientations;
@@ -38,9 +43,7 @@ class _CompactPortraitLockState extends State<CompactPortraitLock> {
     if (compact == _locked) return;
     _locked = compact;
     SystemChrome.setPreferredOrientations(
-      compact
-          ? const [DeviceOrientation.portraitUp]
-          : widget.restoreOrientations,
+      compact ? widget.compactOrientations : widget.restoreOrientations,
     );
   }
 

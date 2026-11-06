@@ -19,7 +19,7 @@ Read `${CLAUDE_PLUGIN_ROOT}/references/platform-facts.md` once at the start. It 
 | 3 | `iphone-duo:uiscene-migration` | 1, 2 | `Info.plist` already has `UIApplicationSceneManifest` and a `FlutterSceneDelegate` subclass |
 | 4 | `iphone-duo:ios-toolchain` | 3 | Local and CI already build with the required Xcode, pods target ≥ iOS 15, no `UIRequiresFullScreen` |
 | 5 | `iphone-duo:responsive-layout` | 4 | Developer opts out (`content_width.enabled: false`) |
-| 6 | `iphone-duo:lifecycle-camera` | 4 | No camera and no orientation lock in the app |
+| 6 | `iphone-duo:lifecycle-media` | 4 | No orientation lock, no media feature (camera, video, maps, audio, other) and no life cycle consumer that stops something |
 | 7 | `iphone-duo:hinge-detection` | 4 | `hinge_support` is `none` |
 | 8 | `iphone-duo:hinge-avoidance` | 5, 7 | `hinge_screens` is empty |
 

@@ -6,13 +6,13 @@
   },
   "metadata": {
     "description": "Claude Code plugins to adopt iPhone Duo (foldable) support in Flutter apps.",
-    "version": "0.2.0"
+    "version": "0.3.0"
   },
   "plugins": [
     {
       "name": "iphone-duo",
-      "description": "An agent and eight step skills that take any Flutter app to full iPhone Duo support: Flutter 3.41+, UIScene, the iOS 27.1 SDK, width-driven layouts, camera life cycle, hinge detection and hinge avoidance.",
-      "version": "0.2.0",
+      "description": "An agent and eight step skills that take any Flutter app to full iPhone Duo support: Flutter 3.41+, UIScene, the iOS 27.1 SDK, width-driven layouts, media life cycle (camera, video, maps, audio), hinge detection and hinge avoidance.",
+      "version": "0.3.0",
       "source": "./plugins/iphone-duo",
       "repository": "https://github.com/alvaroarmijos/iphone-duo-plugin",
       "homepage": "https://github.com/alvaroarmijos/iphone-duo-plugin",
