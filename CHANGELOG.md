@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 — 2026-11-06
 
 - New `stacked` git strategy, now the recommended default. Each step's branch is created from the previous step's branch, and its pull request targets that branch, so every PR shows only its own step. The `adopt` skill documents how to open the stack, rebase it after review changes, and retarget PRs as lower ones merge. `branch-per-step` still creates every branch from the base branch.
 - `uiscene-migration` now follows Flutter's official UIScene guide (https://docs.flutter.dev/release/breaking-changes/uiscenedelegate):
