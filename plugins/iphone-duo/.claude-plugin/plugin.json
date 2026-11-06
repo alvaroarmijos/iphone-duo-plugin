@@ -1,7 +1,7 @@
 {
   "name": "iphone-duo",
-  "version": "0.2.0",
-  "description": "Adopt iPhone Duo support in any Flutter app. An agent interviews you about the project (which screens must avoid the hinge, content width, CI, critical SDKs), then runs eight step skills in order with your approval between steps: Flutter 3.41+ upgrade, UIScene plugin audit, UIScene migration, iOS 27.1 toolchain, width-driven layouts, camera and life cycle, hinge detection and hinge avoidance.",
+  "version": "0.3.0",
+  "description": "Adopt iPhone Duo support in any Flutter app. An agent interviews you about the project (which screens must avoid the hinge, content width, CI, critical SDKs), then runs eight step skills in order with your approval between steps: Flutter 3.41+ upgrade, UIScene plugin audit, UIScene migration, iOS 27.1 toolchain, width-driven layouts, life cycle and media (camera, video, maps, audio), hinge detection and hinge avoidance.",
   "author": {
     "name": "Alvaro Armijos",
     "url": "https://github.com/alvaroarmijos"

@@ -36,14 +36,14 @@ claude --agent iphone-duo:iphone-duo-adopter
    - Podfile deployment target
    - a customized `AppDelegate`, and native code that reads the window
    - plugins that touch the app delegate
-   - orientation locks, `MediaQuery.of(context).size` usage and camera screens
+   - orientation locks, `MediaQuery.of(context).size` usage, and media features (camera, video, maps, audio) with their life cycle handling
    - your UI package and candidate screens
 
    Then it asks only what it can't infer:
    - target Flutter version
    - which SDKs block the whole series if they lack UIScene support
    - max content width
-   - orientation and camera policy
+   - orientation policy, and what each media feature does in Split View
    - **which screens must avoid the hinge, and how to split each one**
    - git strategy (stacked PRs by default: each step's branch and PR sit on top of the previous step's)
 
@@ -60,7 +60,7 @@ claude --agent iphone-duo:iphone-duo-adopter
 | 3 | `uiscene-migration` | Migrates manually: adds a `SceneDelegate` (`FlutterSceneDelegate`) and moves the `AppDelegate` to `FlutterImplicitEngineDelegate`. Removes every `self.window` / `delegate.window` lookup. |
 | 4 | `ios-toolchain` | Sets Xcode 27.1 locally and in CI, raises pods to iOS 15, removes `UIRequiresFullScreen`, and checks the launch screen. Applies the simulator `lipo` workaround if the build needs it. |
 | 5 | `responsive-layout` | Switches layouts to `MediaQuery.sizeOf` / `paddingOf` with per-side safe-area insets. Caps page bodies at a max width (600 pt by default) with `AppContentConstraint`. |
-| 6 | `lifecycle-camera` | Locks portrait only on compact screens and re-evaluates the lock on display changes. Releases the camera on `inactive` and recovers the preview after fold/unfold. |
+| 6 | `lifecycle-media` | Locks orientation only on compact screens and re-evaluates the lock on display changes. Gives every life cycle consumer an explicit Split View policy and applies per-feature fixes: the camera releases on `inactive` and recovers after fold/unfold, video and audio keep playing in Split View, maps keep their position when the display changes. |
 | 7 | `hinge-detection` | Adds `FoldPosture`, `FoldInfo`, `AppFoldScope` and `context.foldInfo` to your UI package, wrapping [`foldable`](https://pub.dev/packages/foldable). Dialogs and sheets stay in one half. |
 | 8 | `hinge-avoidance` | Adds a `FoldSplitView` that lays the chosen screens out on each side of the hinge, in two columns, one side only, or a split list. Every other posture keeps the normal layout. |
 

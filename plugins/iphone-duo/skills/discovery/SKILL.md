@@ -1,6 +1,6 @@
 ---
 name: discovery
-description: Scans a Flutter repo for everything iPhone Duo adoption depends on (Flutter pins, CI and Xcode versions, AppDelegate and native window access, UIScene-sensitive plugins, orientation locks, MediaQuery size usage, camera, UI package, screens) and interviews the developer for the decisions only they can make (target Flutter version, critical SDKs, max content width, which screens must avoid the hinge and how). Writes .iphone-duo/profile.md. Used by iphone-duo:adopt; run alone to refresh the profile.
+description: Scans a Flutter repo for everything iPhone Duo adoption depends on (Flutter pins, CI and Xcode versions, AppDelegate and native window access, UIScene-sensitive plugins, orientation locks, MediaQuery size usage, media and life cycle consumers (camera, video, maps, audio), UI package, screens) and interviews the developer for the decisions only they can make (target Flutter version, critical SDKs, max content width, which screens must avoid the hinge and how). Writes .iphone-duo/profile.md. Used by iphone-duo:adopt; run alone to refresh the profile.
 ---
 
 # Discovery: scan the repo, then ask
@@ -38,7 +38,9 @@ Run these checks from the repo root (read-only). Keep the raw findings; they go 
 - `grep -rn "MediaQuery.of(context).size" lib packages --include=*.dart` (count and files).
 - `grep -rn "setPreferredOrientations" lib packages --include=*.dart`.
 - Safe-area-derived symmetric paddings: `grep -rnE "EdgeInsets.symmetric\(horizontal:.*(padding|viewPadding)" lib packages --include=*.dart`.
-- Camera usage: `package:camera`, `CameraController`, `AppLifecycleState`.
+- Media features, by `kind` (see the `lifecycle-media` skill's feature table): camera (`camera`, `mobile_scanner`, `camerawesome`, `CameraController`), video (`video_player`, `chewie`, `better_player_plus`, `media_kit`, `youtube_player_iframe`), maps (`google_maps_flutter`, `apple_maps_flutter`, `flutter_map`, `mapbox_maps_flutter`, plus `geolocator`/`location` streams), audio (`just_audio`, `audioplayers`, `audio_service`, `record`, `flutter_sound`), other (AR, `flame`, `sensors_plus`, custom native views). For each, list the screens that use it.
+- Life cycle consumers: `grep -rnE "didChangeAppLifecycleState|AppLifecycleListener|AppLifecycleState\.(inactive|paused|hidden)" lib packages --include=*.dart`. For each, note what it does on `inactive` and on `paused`.
+- `UIBackgroundModes` in `ios/Runner/Info.plist` (`audio`, `location`).
 - UI package: a package named like `*_ui`/`design_system`/`ui_kit` with a widgets barrel; else none.
 - App root widget (`MaterialApp`/`MaterialApp.router`/`CupertinoApp`) and its file.
 - Candidate screens: classes ending in `Page`/`Screen`/`View` that build a `Scaffold`; group by feature folder and count.
@@ -64,9 +66,17 @@ Use AskUserQuestion, at most 4 questions per call, recommended option first with
 2. Where shared widgets live: the detected UI package (recommended) or `lib/`.
 3. Orientation policy: unlock everything and adapt by width (recommended), or keep existing locks only on compact screens (`shortestSide < 600`).
 
-**Block D — camera** (only if the app uses the camera)
-1. Split View policy: keep releasing the camera on `inactive` (recommended: the camera plugin's guidance on iOS; the camera is off while in Split View) or release only on `paused`.
-2. Camera screens that currently lock to portrait: lock only on compact screens (recommended) or keep the lock.
+**Block D — media and life cycle** (only if the scan found media features, orientation locks or life cycle consumers that stop something)
+
+In Split View the app stays visible while `inactive`, and fold/unfold moves it between displays in the foreground. Ask one Split View question per detected feature, with the default from the `lifecycle-media` feature table first:
+1. Camera: keep releasing on `inactive` (recommended: the camera plugin's iOS guidance; the camera is off in Split View) or release only on `paused`.
+2. Video: keep playing in Split View and pause on `paused` (recommended), or pause on `inactive` (only for DRM/licensing rules). Fullscreen landscape lock: only on compact screens (recommended) or none.
+3. Maps: keep location updates in Split View and stop them on `paused` (recommended), or stop on `inactive`.
+4. Audio: never stop on `inactive` (recommended). Confirm whether the app plays in the background.
+5. Other features (AR, games, WebView…): ask the three questions in `lifecycle-media/references/other.md`.
+6. Screens that currently lock their orientation: lock only on compact screens (recommended) or keep the lock.
+
+Life cycle consumers that only log or save state need no question.
 
 **Block E — the hinge**
 1. Level of hinge support: **avoid the hinge** on chosen screens (recommended for content apps), a full **two-pane** experience (out of this plugin's scope; record and stop at step 8), or **none** (skip steps 7–8).
@@ -109,10 +119,14 @@ layout:
   ui_package: packages/app_ui
   orientation_policy: unlock
   mediaquery_size_usages: 23
-camera:
-  used: true
-  release_on: inactive
-  portrait_lock_screens: ["lib/camera/view/camera_page.dart"]
+media:                    # was `camera:` before 0.3.0
+  orientation_lock_screens: ["lib/camera/view/camera_page.dart", "lib/player/view/fullscreen_page.dart"]
+  lifecycle_observers: ["lib/app/view/app.dart:42", "lib/player/bloc/player_bloc.dart:88"]
+  features:
+    - {kind: camera, release_on: inactive, screens: ["lib/camera/view/camera_page.dart"]}
+    - {kind: video, pause_on: paused, fullscreen_lock: landscape, screens: ["lib/player/view/player_page.dart"]}
+    - {kind: maps, track_location_in_split_view: true, screens: ["lib/stores/view/stores_map_page.dart"]}
+    - {kind: audio, background: false, screens: ["lib/podcast/view/episode_page.dart"]}
 hinge:
   support: avoid          # avoid | two-pane | none
   modals: confine         # confine | leave

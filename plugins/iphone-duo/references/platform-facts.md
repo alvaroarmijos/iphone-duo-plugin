@@ -41,6 +41,13 @@ Facts the step skills rely on, as of November 2026. Items marked **(re-check)** 
 - The `camera` plugin recommends releasing the controller on `AppLifecycleState.inactive` on iOS. In Split View, the app can be `inactive` while visible, so the preview stops. That is accepted by default.
 - Folding/unfolding with the camera open goes through `inactive` → `resumed`; the controller must re-initialize and the preview must recover.
 
+## Other media
+
+- Split View keeps the app visible while `inactive`, so anything that stops on `inactive` stops in front of the user. Video and audio should stop on `paused`, not `inactive`.
+- `video_player` pauses on `AppLifecycleState.paused` by itself; `VideoPlayerOptions(allowBackgroundPlayback: true)` disables that. **(re-check for the version in use)**
+- Map plugins on iOS are platform views; a size change lays them out again without recreating them, as long as the widget and its controller stay in the tree.
+- Audio interruptions (calls, Siri) come through the iOS audio session, not through `AppLifecycleState`.
+
 ## What the simulator can't do
 
 - Real camera capture and real push notifications (use `xcrun simctl push` with `.apns` payloads).

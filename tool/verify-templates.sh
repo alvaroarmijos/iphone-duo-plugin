@@ -18,7 +18,7 @@ cp "$SKILLS"/hinge-detection/references/fold/*.dart lib/src/fold/
 printf "export 'app_fold_scope.dart';\nexport 'fold_info.dart';\n" > lib/src/fold/fold.dart
 cp "$SKILLS"/hinge-avoidance/references/fold_split_view.dart \
    "$SKILLS"/responsive-layout/references/app_content_constraint.dart \
-   "$SKILLS"/lifecycle-camera/references/compact_portrait_lock.dart lib/src/
+   "$SKILLS"/lifecycle-media/references/compact_portrait_lock.dart lib/src/
 cat > lib/duo_tpl.dart <<'DART'
 library;
 
