@@ -42,7 +42,7 @@ From the profile and a fresh check of each "skip when" condition, write `.iphone
 
 Profile: .iphone-duo/profile.md · Started: <date>
 
-| # | Step | Status | Branch / commit | Notes |
+| # | Step | Status | Branch / commit / PR | Notes |
 |---|---|---|---|---|
 | 1 | flutter-upgrade | pending | | |
 | 2 | uiscene-plugin-audit | skipped | | already on UIScene |
@@ -59,7 +59,9 @@ If `.iphone-duo/progress.md` already exists, resume: re-check the first non-`don
 
 For the next `pending` step:
 
-1. Set it to `in-progress`. If the profile's `git.strategy` is `branch-per-step`, create the branch `<git.branch_prefix><step-name>` from the base branch first (ask if the working tree is dirty).
+1. Set it to `in-progress`. Create the step's branch first (ask if the working tree is dirty):
+   - `stacked`: create `<git.branch_prefix><step-name>` from the branch of the previous step that is not `skipped` (`git.base` for the first step). Pull that branch first so the new one starts from its latest commit.
+   - `branch-per-step`: create `<git.branch_prefix><step-name>` from `git.base`.
 2. Invoke the step's skill. It reads the profile, detects the current state, implements, and runs its own verification. Let it ask the developer anything the profile does not answer, and write new answers back to the profile.
 3. When the skill finishes, report to the developer:
    - what changed (files, with a short `git diff --stat`),
@@ -68,7 +70,23 @@ For the next `pending` step:
 4. Ask: **continue to the next step**, **adjust this step**, or **stop here**.
    - Adjust: apply the changes, re-run the verification, ask again.
    - Continue: if `git.strategy` is not `none`, commit the step (message `feat(ios): <step summary> (iPhone Duo <n>/8)`), set the step to `done` with the commit hash, and go to the next step.
+   - Pull request (only when the developer asks to push or open PRs): see **Stacked pull requests** below.
    - Stop: leave the step `in-progress` (or `done` if approved), summarize where things stand and how to resume (`/iphone-duo:adopt`).
+
+### Stacked pull requests
+
+With `git.strategy: stacked`, each step is one pull request on top of the previous one, so each PR shows only its own step's diff:
+
+1. `git push -u origin <step branch>`.
+2. `gh pr create --base <previous step branch> --head <step branch>`. The first step's PR targets `git.base`.
+3. In the PR body, write `Stacked on #<previous PR>` and list the whole stack in order (`#a → #b → this`). Link the step's spec or skill.
+4. Write the PR number in the step's row of `.iphone-duo/progress.md`.
+
+Keep the stack healthy:
+
+- If a lower PR changes during review, rebase the branches above it (`git rebase --update-refs` from the top branch) and push them with `git push --force-with-lease`. Ask the developer before any force-push.
+- When a lower PR merges, retarget the next PR to `git.base` (`gh pr edit <n> --base <git.base>`) and rebase its branch onto `git.base`.
+- Never base a step's PR on `git.base` while the previous step's PR is still open; its diff would include the previous steps.
 
 ### Hard stops
 
@@ -80,7 +98,7 @@ Set the step to `blocked`, write the reason in Notes, and stop the run when:
 
 ### 4. Finish
 
-When every step is `done` or `skipped`, show the final table, the manual checks still open, and suggest a beta (TestFlight) build before release. Do not push or open pull requests unless asked.
+When every step is `done` or `skipped`, show the final table, the manual checks still open, and suggest a beta (TestFlight) build before release. Do not push or open pull requests unless asked; when asked with `stacked`, open the missing PRs bottom-up as described in **Stacked pull requests**.
 
 ## Rules
 

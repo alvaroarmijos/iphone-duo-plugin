@@ -45,7 +45,7 @@ claude --agent iphone-duo:iphone-duo-adopter
    - max content width
    - orientation and camera policy
    - **which screens must avoid the hinge, and how to split each one**
-   - git strategy
+   - git strategy (stacked PRs by default: each step's branch and PR sit on top of the previous step's)
 
    The answers go to `.iphone-duo/profile.md`. Commit that file so the team shares the decisions.
 2. **Plan.** It shows which steps apply and which are already done, in `.iphone-duo/progress.md`.
