@@ -29,8 +29,8 @@ Facts the step skills rely on, as of November 2026. Items marked **(re-check)** 
 
 ## Flutter
 
-- Flutter supports UIScene by default from **3.41** (`FlutterSceneDelegate`, `FlutterImplicitEngineDelegate`). Migration guide: https://docs.flutter.dev/to/uiscene-migration. **(re-check for the pinned version's exact API)**
-- `flutter config --enable-uiscene-migration` migrates only apps whose `AppDelegate` is the unmodified template. Any customization (SDK init, push, `self.window`, method channels) means a manual migration.
+- The UIScene migration APIs (`FlutterSceneDelegate`, `FlutterImplicitEngineDelegate`, `registrar.viewController`) exist from **3.38**; UIScene is the default from **3.41**. Official guide (source of truth): https://docs.flutter.dev/release/breaking-changes/uiscenedelegate.
+- From 3.41, `flutter run` / `flutter build ios` migrates automatically only apps whose `AppDelegate` is the unmodified template, and prints `Finished migration to UIScene lifecycle`. Any customization (SDK init, push, `self.window`, method channels, UI life cycle methods) means a manual migration. `enable-uiscene-migration: false` under `flutter: config:` in `pubspec.yaml` only hides the CLI warning.
 - **`MediaQuery.displayFeatures` is empty on iOS**: Flutter does not report the iPhone Duo hinge. Open issue: https://github.com/flutter/flutter/issues/192515 (P2), with an unmerged PR (#193025). **(re-check: if fixed in the target Flutter version, prefer the native API and skip the `foldable` package)**
 - Workaround: the **`foldable`** package (https://pub.dev/packages/foldable, `1.0.5`, MIT). It exposes the posture through `DuoMediaQuery.statusOf` (`HingeStatus.closed`, `partiallyOpen`, `fullyOpen`, `unknown`), the hinge angle, reserved regions (`DuoMediaQuery.regionsOf`, `ReservedRegionKind.division` / `occlusion`) and size classes. `FoldableProvider(bridgeMode: DisplayFeatureBridgeMode.full)` also publishes the fold in `MediaQuery.displayFeatures`, which makes Flutter confine dialogs, sheets, popup menus and pickers to one half (~455 pt of the 951 pt inner display); the default `none` publishes nothing. It exports its own `FoldInfo` class: import it with `hide FoldInfo` when the app defines one. If Flutter starts reporting display features on iOS, the bridge stands down automatically. **(re-check version and API)**
 - Alternatives considered and not recommended: `duo_display`, `unfold`, `iphone_duo_ui_pro` (less mature or less documented), a hand-written Swift bridge (duplicates work until Flutter fixes the issue).
@@ -49,6 +49,6 @@ Facts the step skills rely on, as of November 2026. Items marked **(re-check)** 
 ## Sources
 
 - Building Flutter apps for the iPhone Duo — https://medium.com/@mohamedyousufdev/building-flutter-apps-for-the-iphone-duo-98f007b2b617
-- Flutter UIScene migration — https://docs.flutter.dev/to/uiscene-migration
+- Flutter UIScene adoption — https://docs.flutter.dev/release/breaking-changes/uiscenedelegate
 - flutter/flutter#192515 — https://github.com/flutter/flutter/issues/192515
 - foldable — https://pub.dev/packages/foldable
