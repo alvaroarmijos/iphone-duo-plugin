@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+- `uiscene-migration` now follows Flutter's official UIScene guide (https://docs.flutter.dev/release/breaking-changes/uiscenedelegate):
+  - The automatic path is a plain `flutter build ios` / `flutter run` on 3.41+, not `flutter config`.
+  - The `SceneDelegate` is optional, and the manifest defaults to `FlutterSceneDelegate`.
+  - The `Info.plist` manifest now uses the guide's keys (`UISceneClassName`, `UISceneConfigurationName = flutter`).
+  - New steps cover the UI life cycle callbacks that UIKit no longer calls, bespoke `FlutterViewController` use, and APIs that must stay in `didFinishLaunching`.
+  - First-party plugins use the `registrar.viewController` pattern.
+  - Rollback is documented through `_UIApplicationSceneManifest`.
+- New `references/AppDelegate.md` with the guide's Swift and Objective-C AppDelegate and SceneDelegate code.
+
 ## 0.1.0 — 2026-11-06
 
 - First release.

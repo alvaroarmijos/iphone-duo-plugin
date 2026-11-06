@@ -3,13 +3,19 @@ import UIKit
 
 /// Scene delegate for the single app scene.
 ///
-/// Subclass of FlutterSceneDelegate (Flutter >= 3.41). Start with no logic;
-/// add only what step 2's audit or controller-dependent setup requires,
-/// and always call super so Flutter and its plugins receive every event.
-/// Check the Flutter UIScene migration guide for the pinned version's API.
+/// Optional (https://docs.flutter.dev/release/breaking-changes/uiscenedelegate):
+/// create it only when there is scene work to do (moved UI life cycle logic,
+/// FlutterViewController setup, step 2 workarounds). Otherwise the manifest
+/// names FlutterSceneDelegate directly.
+///
+/// FlutterSceneDelegate is available from Flutter 3.38 (UIScene is the default
+/// from 3.41). Register it in Info.plist as $(PRODUCT_MODULE_NAME).SceneDelegate.
+/// Every override calls super so Flutter and its plugins receive every event.
 class SceneDelegate: FlutterSceneDelegate {
 
   // Example: setup that needs the FlutterViewController once the window exists.
+  // Cold-start URLs, user activities and shortcut items also arrive here,
+  // in connectionOptions.
   //
   // override func scene(
   //   _ scene: UIScene,
@@ -22,6 +28,19 @@ class SceneDelegate: FlutterSceneDelegate {
   //   }
   // }
 
+  // Example: UI life cycle logic moved from the AppDelegate
+  // (applicationDidBecomeActive -> sceneDidBecomeActive, and so on).
+  //
+  // override func sceneDidBecomeActive(_ scene: UIScene) {
+  //   super.sceneDidBecomeActive(scene)
+  //   // former applicationDidBecomeActive logic
+  // }
+  //
+  // override func sceneDidEnterBackground(_ scene: UIScene) {
+  //   super.sceneDidEnterBackground(scene)
+  //   // former applicationDidEnterBackground logic
+  // }
+
   // Example: forward URLs to a plugin that has no scene support (step 2 workaround).
   //
   // override func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
@@ -30,8 +49,7 @@ class SceneDelegate: FlutterSceneDelegate {
   // }
 }
 
-// AppDelegate shape (Swift). Use the exact protocol and callback names from
-// the migration guide of the pinned Flutter version.
+// AppDelegate (Swift), as in the official guide. Objective-C: references/AppDelegate.md.
 //
 // @main
 // @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
@@ -39,12 +57,17 @@ class SceneDelegate: FlutterSceneDelegate {
 //     _ application: UIApplication,
 //     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
 //   ) -> Bool {
-//     // SDK init that doesn't need a window or a controller stays here.
+//     // Only work that needs no window or controller, plus APIs Apple requires
+//     // before launch finishes (UNUserNotificationCenter delegate, BGTaskScheduler).
 //     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
 //   }
 //
 //   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
 //     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
-//     // Method channels: create them with the engine bridge's messenger.
+//
+//     let channel = FlutterMethodChannel(
+//       name: "com.example/channel",
+//       binaryMessenger: engineBridge.applicationRegistrar.messenger()
+//     )
 //   }
 // }

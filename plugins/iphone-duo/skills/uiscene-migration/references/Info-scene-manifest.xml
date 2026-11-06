@@ -1,4 +1,10 @@
-<!-- Add inside the top-level <dict> of ios/Runner/Info.plist. -->
+<!-- Add inside the top-level <dict> of ios/Runner/Info.plist.
+     Matches https://docs.flutter.dev/release/breaking-changes/uiscenedelegate
+     UISceneDelegateClassName:
+       FlutterSceneDelegate                    no custom SceneDelegate (default)
+       $(PRODUCT_MODULE_NAME).SceneDelegate    Swift subclass of FlutterSceneDelegate
+       SceneDelegate                           Objective-C subclass of FlutterSceneDelegate
+     Rollback: rename the key to _UIApplicationSceneManifest to turn UIScene off temporarily. -->
 <key>UIApplicationSceneManifest</key>
 <dict>
   <key>UIApplicationSupportsMultipleScenes</key>
@@ -8,10 +14,12 @@
     <key>UIWindowSceneSessionRoleApplication</key>
     <array>
       <dict>
-        <key>UISceneConfigurationName</key>
-        <string>Default Configuration</string>
+        <key>UISceneClassName</key>
+        <string>UIWindowScene</string>
         <key>UISceneDelegateClassName</key>
-        <string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+        <string>FlutterSceneDelegate</string>
+        <key>UISceneConfigurationName</key>
+        <string>flutter</string>
         <!-- Keep only if the app uses Main.storyboard. -->
         <key>UISceneStoryboardFile</key>
         <string>Main</string>

@@ -1,8 +1,51 @@
 # Finding the window and the FlutterViewController under UIScene
 
-Under UIScene, `UIApplication.delegate.window`, `AppDelegate.window`, `UIApplication.shared.keyWindow` and `UIApplication.shared.windows` are `nil` or deprecated. Resolve the window from the foreground scene **when you need it**, never cache it at launch: the iPhone Duo moves the scene between displays.
+Under UIScene, `UIApplication.delegate.window` and `AppDelegate.window` are `nil`, and `UIApplication.shared.keyWindow`, `UIApplication.shared.windows` and `UIScreen.main` are deprecated. Resolve the window from a scene **when you need it**, never cache it at launch: the iPhone Duo moves the scene between displays.
 
-## Swift
+Replacements, from Flutter's official guide (https://docs.flutter.dev/release/breaking-changes/uiscenedelegate):
+
+| Deprecated | Replacement |
+|---|---|
+| `UIScreen.main` | `windowScene.screen` |
+| `UIApplication.shared.keyWindow` | `windowScene.keyWindow` |
+| `UIApplication.shared.windows` | `windowScene.windows` |
+| `UIApplication.shared.delegate.window` | `view.window` |
+
+## First-party plugins (Flutter 3.38+)
+
+The guide's pattern: keep the registrar and reach the window through its `viewController`.
+
+```swift
+public class MyPlugin: NSObject, FlutterPlugin {
+  weak var registrar: FlutterPluginRegistrar?
+
+  init(registrar: FlutterPluginRegistrar) {
+    self.registrar = registrar
+  }
+
+  public static func register(with registrar: FlutterPluginRegistrar) {
+    let instance = MyPlugin(registrar: registrar)
+    // ...
+  }
+
+  func someMethod() {
+    let window = registrar?.viewController?.view.window
+    let screen = window?.windowScene?.screen
+  }
+}
+```
+
+```objc
+// Before:  UIViewController *root = [[[UIApplication sharedApplication] delegate] window].rootViewController;
+// After:   UIWindow *window = self.registrar.viewController.view.window;
+//          UIScreen *screen = window.windowScene.screen;
+```
+
+## App code without a registrar (SDK callbacks, AppDelegate)
+
+Look up the foreground scene at call time.
+
+### Swift
 
 ```swift
 import Flutter
@@ -11,14 +54,9 @@ import UIKit
 extension UIApplication {
   /// Key window of the foreground-active window scene, if any.
   var activeKeyWindow: UIWindow? {
-    connectedScenes
-      .compactMap { $0 as? UIWindowScene }
-      .first { $0.activationState == .foregroundActive }?
-      .windows.first { $0.isKeyWindow }
-      // Fallback: any window scene (e.g. while the app is still inactive).
-      ?? connectedScenes
-        .compactMap { $0 as? UIWindowScene }
-        .first?.windows.first { $0.isKeyWindow }
+    let scenes = connectedScenes.compactMap { $0 as? UIWindowScene }
+    return (scenes.first { $0.activationState == .foregroundActive } ?? scenes.first)?
+      .keyWindow
   }
 
   /// The app's FlutterViewController, found from the active scene's root.
@@ -40,24 +78,21 @@ func someSdk(_ sdk: SomeSdk, shouldOpenURL url: URL) -> Bool {
 }
 ```
 
-## Objective-C (first-party plugins)
+### Objective-C
 
 ```objc
 static UIWindow *ActiveKeyWindow(void) {
+  UIWindowScene *fallback = nil;
   for (UIScene *scene in UIApplication.sharedApplication.connectedScenes) {
-    if (scene.activationState != UISceneActivationStateForegroundActive) continue;
     if (![scene isKindOfClass:[UIWindowScene class]]) continue;
-    for (UIWindow *window in ((UIWindowScene *)scene).windows) {
-      if (window.isKeyWindow) return window;
+    UIWindowScene *windowScene = (UIWindowScene *)scene;
+    if (scene.activationState == UISceneActivationStateForegroundActive) {
+      return windowScene.keyWindow;
     }
+    if (fallback == nil) fallback = windowScene;
   }
-  return nil;
+  return fallback.keyWindow;
 }
-
-// Before:  UIViewController *root = [[[UIApplication sharedApplication] delegate] window].rootViewController;
-// After:   UIViewController *root = ActiveKeyWindow().rootViewController;
 ```
 
 Inside a view controller that is on screen, `self.view.window` keeps working and is the simplest choice.
-
-A plugin can also keep a reference to its registrar's view controller when the Flutter version exposes one (`registrar.viewController`); check the pinned version's API.
