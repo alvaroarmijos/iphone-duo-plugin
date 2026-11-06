@@ -56,7 +56,7 @@ Use AskUserQuestion, at most 4 questions per call, recommended option first with
 
 **Block B — risk**
 1. Critical SDKs: from the detected plugin list, which SDKs make the whole series **stop** if they have no UIScene support (typically push/marketing SDKs that own notifications and deep links)? The rest get a documented workaround instead.
-2. Git strategy: one branch + commit per step (recommended), commits on the current branch, or no commits.
+2. Git strategy: stacked branches, one per step, each created from the previous step's branch with its PR based on it (recommended); one branch per step from the base branch; commits on the current branch; or no commits. Also ask the base branch the stack starts from (for example `main` or an integration branch).
 3. Android foldables: out of scope (recommended) or in scope (note: this plugin only covers iOS).
 
 **Block C — layout**
@@ -122,7 +122,7 @@ hinge:
     - {screen: LotteryPage, file: lib/lottery/view/lottery_page.dart, mode: list-split}
 devices: simulator-only
 git:
-  strategy: branch-per-step   # branch-per-step | current-branch | none
+  strategy: stacked           # stacked | branch-per-step | current-branch | none
   branch_prefix: feat/iphone-duo-
   base: main
 android_foldables: out
