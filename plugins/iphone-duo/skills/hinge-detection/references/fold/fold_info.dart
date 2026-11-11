@@ -22,7 +22,8 @@ class FoldInfo {
 
   final FoldPosture posture;
 
-  /// The hinge in global (screen) coordinates.
+  /// The hinge in the Flutter view's local coordinates (logical pixels).
+  ///
   /// Only non-null when [posture] is [FoldPosture.halfOpened].
   final Rect? hingeBounds;
 

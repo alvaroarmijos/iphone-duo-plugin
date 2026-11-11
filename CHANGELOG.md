@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- `hinge-detection` and `hinge-avoidance`: the hinge rectangle is documented as being in the Flutter view's local coordinates (logical pixels), not in global screen coordinates. Updated the `FoldInfo.hingeBounds` doc, the `FoldSplitView` origin comment, the hinge-avoidance risk table and `platform-facts.md`.
+
 ## 0.3.0 — 2026-11-06
 
 - **Breaking:** step 6 is now `lifecycle-media` (was `lifecycle-camera`). It covers every feature that reacts to the life cycle or locks the orientation, not just the camera:

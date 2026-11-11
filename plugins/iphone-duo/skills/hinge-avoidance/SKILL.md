@@ -60,4 +60,4 @@ Horizontal hinge: `start` goes on top, `end` below.
 | Splitting a big screen mixes layout with listeners and state | Only presentation widgets move; listeners, overlays and providers stay outside `FoldSplitView`. |
 | Two independently scrolling columns disorient on long lists | Accepted for `list-split`; revisit in QA (a single-scroll grid is a future option). |
 | A posture change loses scroll position or progress | Providers above `FoldSplitView`; end-to-end check switches posture mid-flow. |
-| The widget isn't at the screen origin | `FoldSplitView` measures its global origin and shifts the hinge into local coordinates. |
+| The widget isn't at the view origin | `FoldSplitView` measures its origin in the Flutter view and shifts the hinge into the widget's local coordinates. |

@@ -33,8 +33,9 @@ class FoldSplitView extends StatefulWidget {
 }
 
 class _FoldSplitViewState extends State<FoldSplitView> {
-  /// Global position of this widget. The hinge comes in screen coordinates,
-  /// so it is shifted by this origin to get local coordinates. Measured after
+  /// Position of this widget in the Flutter view. The hinge comes in the
+  /// view's coordinates (the space `localToGlobal` maps to), so it is shifted
+  /// by this origin to get the widget's local coordinates. Measured after
   /// layout; the first half-opened frame assumes the widget's previous origin.
   Offset _origin = Offset.zero;
 
